@@ -1,6 +1,3 @@
-SERVERPORT = 27772
-FWDPORT = 29772
-
 K=kernel
 U=user
 
@@ -173,11 +170,10 @@ QEMUGDB = $(shell if $(QEMU) -help | grep -q '^-gdb'; \
 	then echo "-gdb tcp::$(GDBPORT)"; \
 	else echo "-s -p $(GDBPORT)"; fi)
 ifndef CPUS
-# CPUS := 1
-CPUS := 3
+CPUS := 1
 endif
 
-# FWDPORT = $(shell expr `id -u` % 5000 + 25999)
+FWDPORT = $(shell expr `id -u` % 5000 + 25999)
 
 QEMUEXTRA = 
 QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic
@@ -196,13 +192,13 @@ qemu-gdb: $K/kernel .gdbinit fs.img
 	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
 
 # try to generate a unique port for the echo server
-# SERVERPORT = $(shell expr `id -u` % 5000 + 25099)
+SERVERPORT = $(shell expr `id -u` % 5000 + 25099)
 
 server:
-	python server.py $(SERVERPORT)
+	python2 server.py $(SERVERPORT)
 
 ping:
-	python ping.py $(FWDPORT)
+	python2 ping.py $(FWDPORT)
 
 ##
 ##  FOR submitting lab solutions
