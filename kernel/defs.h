@@ -10,6 +10,7 @@ struct stat;
 struct superblock;
 struct mbuf;
 struct sock;
+struct map_info; // ccc:mmap
 
 // bio.c
 void            binit(void);
@@ -84,6 +85,8 @@ void            ramdiskrw(struct buf*);
 void*           kalloc(void);
 void            kfree(void *);
 void            kinit();
+void            kref(void*);   // ccc:mmap
+void            kderef(void*); // ccc:mmap
 
 // log.c
 void            initlog(int, struct superblock*);
@@ -193,6 +196,12 @@ uint64          walkaddr(pagetable_t, uint64);
 int             copyout(pagetable_t, uint64, char *, uint64);
 int             copyin(pagetable_t, char *, uint64, uint64);
 int             copyinstr(pagetable_t, char *, uint64, uint64);
+
+// ccc:mmap
+uint64          sys_mmap(void);
+uint64          sys_munmap(void);
+void            mmap_dup(pagetable_t, struct map_info*);
+void            mmap_dedup(pagetable_t, struct map_info*);
 
 // plic.c
 void            plicinit(void);

@@ -24,3 +24,7 @@
 
 // System calls for labs
 #define SYS_ntas   23
+
+// ccc:mmap
+#define SYS_mmap 24
+#define SYS_munmap 25
