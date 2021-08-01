@@ -95,10 +95,11 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB = $U/ulib.o $U/usys.o $U/printf.o $U/umalloc.o
+ULIB = $(U)/_main.o $U/ulib.o $U/usys.o $U/printf.o $U/sscanf.o $U/umalloc.o
 
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+	$(LD) $(LDFLAGS) -N -e _main -Ttext 0 -o $@ $^
+# $(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 	$(OBJDUMP) -S $@ > $*.asm
 	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
@@ -117,6 +118,9 @@ $U/_forktest: $U/forktest.o $(ULIB)
 $U/_uthread: $U/uthread.o $U/uthread_switch.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_uthread $U/uthread.o $U/uthread_switch.o $(ULIB)
 	$(OBJDUMP) -S $U/_uthread > $U/uthread.asm
+
+$U/c4.o : $U/c4.c
+	$(CC) -w $(CFLAGS) -c -o $U/c4.o $U/c4.c
 
 mkfs/mkfs: mkfs/mkfs.c $K/fs.h
 	gcc -Werror -Wall -I. -o mkfs/mkfs mkfs/mkfs.c
@@ -153,9 +157,14 @@ UPROGS=\
 	$U/_alloctest\
 	$U/_bigfile\
 	$U/_mmaptest\
+	$U/_cp\
+	$U/_c4\
+	$U/_editor\
+
+DOCS = README user/xargstest.sh doc/hello.c doc/sum.c doc/fib.c
 	
-fs.img: mkfs/mkfs README user/xargstest.sh $(UPROGS)
-	mkfs/mkfs fs.img README user/xargstest.sh $(UPROGS)
+fs.img: mkfs/mkfs $(DOCS) $(UPROGS)
+	mkfs/mkfs fs.img $(DOCS) $(UPROGS)
 
 -include kernel/*.d user/*.d
 
