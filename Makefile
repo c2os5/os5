@@ -154,13 +154,13 @@ UPROGS=\
 	$U/_mmaptest\
 	$U/_forktest\
 	$U/_usertests\
+	$U/_bigfile\
 #	$U/_cowtest\
 #	$U/_call\
 #	$U/_testsh\
 #	$U/_kalloctest\
 #	$U/_bcachetest\
 #	$U/_alloctest\
-#	$U/_bigfile\
 
 DOCS = doc/README doc/hello.c doc/sum.c doc/fib.c
 # user/xargstest.sh
