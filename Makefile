@@ -209,10 +209,10 @@ qemu-gdb: $K/kernel .gdbinit fs.img
 # SERVERPORT = $(shell expr `id -u` % 5000 + 25099)
 
 server:
-	python server.py $(SERVERPORT)
+	python lab/server.py $(SERVERPORT)
 
 ping:
-	python ping.py $(FWDPORT)
+	python lab/ping.py $(FWDPORT)
 
 ##
 ##  FOR submitting lab solutions
