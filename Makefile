@@ -134,7 +134,6 @@ mkfs/mkfs: mkfs/mkfs.c $K/fs.h
 UPROGS=\
 	$U/_cat\
 	$U/_echo\
-	$U/_forktest\
 	$U/_grep\
 	$U/_init\
 	$U/_kill\
@@ -144,24 +143,26 @@ UPROGS=\
 	$U/_rm\
 	$U/_sh\
 	$U/_stressfs\
-	$U/_usertests\
 	$U/_wc\
 	$U/_zombie\
-	$U/_nettests\
-	$U/_cowtest\
 	$U/_uthread\
-	$U/_call\
-	$U/_testsh\
-	$U/_kalloctest\
-	$U/_bcachetest\
-	$U/_alloctest\
-	$U/_bigfile\
-	$U/_mmaptest\
 	$U/_cp\
 	$U/_c4\
 	$U/_editor\
+	$U/_nettests\
+	$U/_mmaptest\
+	$U/_forktest\
+	$U/_usertests\
+#	$U/_cowtest\
+#	$U/_call\
+#	$U/_testsh\
+#	$U/_kalloctest\
+#	$U/_bcachetest\
+#	$U/_alloctest\
+#	$U/_bigfile\
 
-DOCS = README user/xargstest.sh doc/hello.c doc/sum.c doc/fib.c
+DOCS = doc/README doc/hello.c doc/sum.c doc/fib.c
+# user/xargstest.sh
 	
 fs.img: mkfs/mkfs $(DOCS) $(UPROGS)
 	mkfs/mkfs fs.img $(DOCS) $(UPROGS)
