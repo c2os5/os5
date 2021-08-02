@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "../lib/lib.h"
 
 #define SMAX 128
 #define TMAX 1024

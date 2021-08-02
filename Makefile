@@ -3,6 +3,7 @@ FWDPORT = 29772
 
 K=kernel
 U=user
+L=lib
 
 OBJS = \
   $K/entry.o \
@@ -95,13 +96,13 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB = $(U)/_main.o $U/ulib.o $U/usys.o $U/printf.o $U/sscanf.o $U/umalloc.o
+ULIB = $L/_main.o $L/ulib.o $U/usys.o $L/printf.o $L/sscanf.o $L/umalloc.o
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e _main -Ttext 0 -o $@ $^
-# $(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
-	$(OBJDUMP) -S $@ > $*.asm
-	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
+#	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
+#	$(OBJDUMP) -S $@ > $*.asm
+#	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
 
 $U/usys.S : $U/usys.pl
 	perl $U/usys.pl > $U/usys.S
@@ -112,7 +113,7 @@ $U/usys.o : $U/usys.S
 $U/_forktest: $U/forktest.o $(ULIB)
 	# forktest has less library code linked in - needs to be small
 	# in order to be able to max out the proc table.
-	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $U/ulib.o $U/usys.o
+	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $U/_forktest $U/forktest.o $L/ulib.o $U/usys.o
 	$(OBJDUMP) -S $U/_forktest > $U/forktest.asm
 
 $U/_uthread: $U/uthread.o $U/uthread_switch.o $(ULIB)

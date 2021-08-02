@@ -14,7 +14,7 @@
 #include <fcntl.h>
 // #define int long long
 */
-#include "lib.h"
+#include "../lib/lib.h"
 
 char *p, *lp, // current position in source code (p: 目前原始碼指標, lp: 上一行原始碼指標)
      *data;   // data/bss pointer (資料段機器碼指標)

@@ -1,4 +1,4 @@
-#include "lib.h"
+#include "../lib/lib.h"
 
 char buf[512];
 
