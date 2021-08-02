@@ -6,7 +6,7 @@ os5 was forked from https://github.com/monkey2000/xv6-riscv-fall19.
 
 However, we try to extend xv6 to os5 for teach & use. 
 
-os5 include the following API not supported by xv6.
+os5 add the following features to xv6.
 
 1. net -- socket/tcp/ip.
     * https://blog.mky.moe/mit6828/10-lab10/
@@ -14,11 +14,13 @@ os5 include the following API not supported by xv6.
     * https://blog.mky.moe/mit6828/6-lab06/
 3. mmap -- memory mapped & sharing. (IPC)
     * https://blog.mky.moe/mit6828/9-lab09/
-4. c4 -- A mini c compiler.
+4. bigfile -- add NDOUBLE_INDIRECT index to inode
+    * https://blog.mky.moe/mit6828/8-lab08/
+5. c4 -- A mini c compiler.
     * https://github.com/rswier/c4
-5. kilo -- A mini editor.
+6. kilo -- A mini editor.
     * https://github.com/antirez/kilo
-6. telnet
+7. telnet
     * add by ccc
 
 
