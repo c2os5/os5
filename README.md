@@ -1,12 +1,12 @@
-[中文電子書 -- c2os5](https://github.com/c2os5/c2os5/wiki)
+[中文電子書 -- 從 RISC-V 處理器到 UNIX 作業系統](https://github.com/riscv2os/riscv2os/wiki)
 
-# os5 -- A UNIX like OS on RISC-V
+# xv7 -- A UNIX like OS on RISC-V
 
-os5 was forked from https://github.com/monkey2000/xv6-riscv-fall19. 
+xv7 was forked from https://github.com/monkey2000/xv6-riscv-fall19. 
 
 However, we try to extend xv6 to os5 for teach & use. 
 
-os5 add the following features to xv6.
+xv7 add the following features to xv6.
 
 1. net -- socket/tcp/ip.
     * https://blog.mky.moe/mit6828/10-lab10/
