@@ -1,27 +1,13 @@
 [中文電子書 -- 從 RISC-V 處理器到 UNIX 作業系統](https://github.com/riscv2os/riscv2os/wiki)
 
-# xv7 -- A UNIX like OS on RISC-V
+xv7 作業系統是擴充自 [xv6-riscv](xv6) 的一個教學型作業系統，但預計會做下列延伸：
 
-xv7 was forked from https://github.com/monkey2000/xv6-riscv-fall19. 
-
-However, we try to extend xv6 to os5 for teach & use. 
-
-xv7 add the following features to xv6.
-
-1. net -- socket/tcp/ip.
-    * https://blog.mky.moe/mit6828/10-lab10/
-2. uthread -- user level thread.
-    * https://blog.mky.moe/mit6828/6-lab06/
-3. mmap -- memory mapped & sharing. (IPC)
-    * https://blog.mky.moe/mit6828/9-lab09/
-4. bigfile -- add NDOUBLE_INDIRECT index to inode
-    * https://blog.mky.moe/mit6828/8-lab08/
-5. c4 -- A mini c compiler.
-    * https://github.com/rswier/c4
-6. kilo -- A mini editor.
-    * https://github.com/antirez/kilo
-7. telnet
-    * add by ccc
+1. xv7: tcp/ip/ethernet 網路堆疊
+2. xv7: mmap 共用記憶體
+3. xv7: 擴大檔案大小限制 -- 加入雙層間接連結
+4. xv7: 加入一個小型的 c 語言編譯器 (c4)
+5. xv7: 加入一個小型的編輯器 (kilo) -- (未完成)
+6. xv7: 加入 telnet 的功能 -- (未完成)
 
 
 ## xv6 原始聲明
