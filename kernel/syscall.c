@@ -7,12 +7,12 @@
 #include "syscall.h"
 #include "defs.h"
 
-// Fetch the uint64 at addr from the current process.
+// Fetch the word_t at addr from the current process.
 int
-fetchaddr(uint64 addr, uint64 *ip)
+fetchaddr(word_t addr, word_t *ip)
 {
   struct proc *p = myproc();
-  if(addr >= p->sz || addr+sizeof(uint64) > p->sz)
+  if(addr >= p->sz || addr+sizeof(word_t) > p->sz)
     return -1;
   if(copyin(p->pagetable, (char *)ip, addr, sizeof(*ip)) != 0)
     return -1;
@@ -22,7 +22,7 @@ fetchaddr(uint64 addr, uint64 *ip)
 // Fetch the nul-terminated string at addr from the current process.
 // Returns length of string, not including nul, or -1 for error.
 int
-fetchstr(uint64 addr, char *buf, int max)
+fetchstr(word_t addr, char *buf, int max)
 {
   struct proc *p = myproc();
   int err = copyinstr(p->pagetable, buf, addr, max);
@@ -31,7 +31,7 @@ fetchstr(uint64 addr, char *buf, int max)
   return strlen(buf);
 }
 
-static uint64
+static word_t
 argraw(int n)
 {
   struct proc *p = myproc();
@@ -65,7 +65,7 @@ argint(int n, int *ip)
 // Doesn't check for legality, since
 // copyin/copyout will do that.
 int
-argaddr(int n, uint64 *ip)
+argaddr(int n, word_t *ip)
 {
   *ip = argraw(n);
   return 0;
@@ -77,37 +77,37 @@ argaddr(int n, uint64 *ip)
 int
 argstr(int n, char *buf, int max)
 {
-  uint64 addr;
+  word_t addr;
   if(argaddr(n, &addr) < 0)
     return -1;
   return fetchstr(addr, buf, max);
 }
 
-extern uint64 sys_chdir(void);
-extern uint64 sys_close(void);
-extern uint64 sys_dup(void);
-extern uint64 sys_exec(void);
-extern uint64 sys_exit(void);
-extern uint64 sys_fork(void);
-extern uint64 sys_fstat(void);
-extern uint64 sys_getpid(void);
-extern uint64 sys_kill(void);
-extern uint64 sys_link(void);
-extern uint64 sys_mkdir(void);
-extern uint64 sys_mknod(void);
-extern uint64 sys_open(void);
-extern uint64 sys_pipe(void);
-extern uint64 sys_read(void);
-extern uint64 sys_sbrk(void);
-extern uint64 sys_sleep(void);
-extern uint64 sys_unlink(void);
-extern uint64 sys_wait(void);
-extern uint64 sys_write(void);
-extern uint64 sys_uptime(void);
-extern uint64 sys_connect(void);
-extern uint64 sys_ntas(void);
+extern word_t sys_chdir(void);
+extern word_t sys_close(void);
+extern word_t sys_dup(void);
+extern word_t sys_exec(void);
+extern word_t sys_exit(void);
+extern word_t sys_fork(void);
+extern word_t sys_fstat(void);
+extern word_t sys_getpid(void);
+extern word_t sys_kill(void);
+extern word_t sys_link(void);
+extern word_t sys_mkdir(void);
+extern word_t sys_mknod(void);
+extern word_t sys_open(void);
+extern word_t sys_pipe(void);
+extern word_t sys_read(void);
+extern word_t sys_sbrk(void);
+extern word_t sys_sleep(void);
+extern word_t sys_unlink(void);
+extern word_t sys_wait(void);
+extern word_t sys_write(void);
+extern word_t sys_uptime(void);
+extern word_t sys_connect(void);
+extern word_t sys_ntas(void);
 
-static uint64 (*syscalls[])(void) = {
+static word_t (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
 [SYS_exit]    sys_exit,
 [SYS_wait]    sys_wait,

@@ -105,7 +105,7 @@ sockclose(struct sock *so) {
 }
 
 int
-sockwrite(struct sock *so, uint64 addr, int n) {
+sockwrite(struct sock *so, word_t addr, int n) {
   struct proc *p = myproc();
 
   struct mbuf *m = mbufalloc(sizeof(struct eth) + sizeof(struct ip) + sizeof(struct udp));
@@ -123,7 +123,7 @@ sockwrite(struct sock *so, uint64 addr, int n) {
 }
 
 int
-sockread(struct sock *so, uint64 addr, int n) {
+sockread(struct sock *so, word_t addr, int n) {
   struct proc *p = myproc();
 
   acquire(&so->lock);

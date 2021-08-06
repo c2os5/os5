@@ -162,7 +162,7 @@ UPROGS=\
 #	$U/_bcachetest\
 #	$U/_alloctest\
 
-DOCS = doc/README doc/hello.c doc/sum.c doc/fib.c
+DOCS = doc/README doc/hello.c doc/sum.c doc/fib.c user/c4.c
 # user/xargstest.sh
 	
 fs.img: mkfs/mkfs $(DOCS) $(UPROGS)

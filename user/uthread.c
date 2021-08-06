@@ -12,22 +12,22 @@
 
 // Saved registers for kernel context switches.
 struct context {
-  uint64 ra;
-  uint64 sp;
+  word_t ra;
+  word_t sp;
 
   // callee-saved
-  uint64 s0;
-  uint64 s1;
-  uint64 s2;
-  uint64 s3;
-  uint64 s4;
-  uint64 s5;
-  uint64 s6;
-  uint64 s7;
-  uint64 s8;
-  uint64 s9;
-  uint64 s10;
-  uint64 s11;
+  word_t s0;
+  word_t s1;
+  word_t s2;
+  word_t s3;
+  word_t s4;
+  word_t s5;
+  word_t s6;
+  word_t s7;
+  word_t s8;
+  word_t s9;
+  word_t s10;
+  word_t s11;
 };
 
 struct thread {
@@ -37,7 +37,7 @@ struct thread {
 };
 struct thread all_thread[MAX_THREAD];
 struct thread *current_thread;
-extern void thread_switch(uint64, uint64);
+extern void thread_switch(word_t, word_t);
 
 void 
 thread_init(void)
@@ -82,7 +82,7 @@ thread_schedule(void)
      * Invoke thread_switch to switch from t to next_thread:
      * thread_switch(??, ??);
      */
-    thread_switch((uint64) &t->ctx, (uint64) &next_thread->ctx);
+    thread_switch((word_t) &t->ctx, (word_t) &next_thread->ctx);
   } else
     next_thread = 0;
 }
@@ -97,8 +97,8 @@ thread_create(void (*func)())
   }
   t->state = RUNNABLE;
 
-  t->ctx.ra = (uint64) func;
-  t->ctx.sp = (uint64) (&t->stack) + STACK_SIZE;
+  t->ctx.ra = (word_t) func;
+  t->ctx.sp = (word_t) (&t->stack) + STACK_SIZE;
 }
 
 void 

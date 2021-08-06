@@ -7,14 +7,14 @@
 #include "defs.h"
 #include "elf.h"
 
-static int loadseg(pde_t *pgdir, uint64 addr, struct inode *ip, uint offset, uint sz);
+static int loadseg(pde_t *pgdir, word_t addr, struct inode *ip, uint offset, uint sz);
 
 int
 exec(char *path, char **argv)
 {
   char *s, *last;
   int i, off;
-  uint64 argc, sz, sp, ustack[MAXARG+1], stackbase;
+  word_t argc, sz, sp, ustack[MAXARG+1], stackbase;
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -30,7 +30,7 @@ exec(char *path, char **argv)
   ilock(ip);
 
   // Check ELF header
-  if(readi(ip, 0, (uint64)&elf, 0, sizeof(elf)) != sizeof(elf))
+  if(readi(ip, 0, (word_t)&elf, 0, sizeof(elf)) != sizeof(elf))
     goto bad;
   if(elf.magic != ELF_MAGIC)
     goto bad;
@@ -41,7 +41,7 @@ exec(char *path, char **argv)
   // Load program into memory.
   sz = 0;
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
-    if(readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
+    if(readi(ip, 0, (word_t)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
     if(ph.type != ELF_PROG_LOAD)
       continue;
@@ -61,7 +61,7 @@ exec(char *path, char **argv)
   ip = 0;
 
   p = myproc();
-  uint64 oldsz = p->sz;
+  word_t oldsz = p->sz;
 
   // Allocate two pages at the next page boundary.
   // Use the second as the user stack.
@@ -87,11 +87,11 @@ exec(char *path, char **argv)
   ustack[argc] = 0;
 
   // push the array of argv[] pointers.
-  sp -= (argc+1) * sizeof(uint64);
+  sp -= (argc+1) * sizeof(word_t);
   sp -= sp % 16;
   if(sp < stackbase)
     goto bad;
-  if(copyout(pagetable, sp, (char *)ustack, (argc+1)*sizeof(uint64)) < 0)
+  if(copyout(pagetable, sp, (char *)ustack, (argc+1)*sizeof(word_t)) < 0)
     goto bad;
 
   // arguments to user main(argc, argv)
@@ -130,10 +130,10 @@ exec(char *path, char **argv)
 // and the pages from va to va+sz must already be mapped.
 // Returns 0 on success, -1 on failure.
 static int
-loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset, uint sz)
+loadseg(pagetable_t pagetable, word_t va, struct inode *ip, uint offset, uint sz)
 {
   uint i, n;
-  uint64 pa;
+  word_t pa;
 
   if((va % PGSIZE) != 0)
     panic("loadseg: va must be page aligned");
@@ -146,7 +146,7 @@ loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset, uint sz
       n = sz - i;
     else
       n = PGSIZE;
-    if(readi(ip, 0, (uint64)pa, offset+i, n) != n)
+    if(readi(ip, 0, (word_t)pa, offset+i, n) != n)
       return -1;
   }
   

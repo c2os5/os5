@@ -9,9 +9,9 @@ struct elfhdr {
   ushort type;
   ushort machine;
   uint version;
-  uint64 entry;
-  uint64 phoff;
-  uint64 shoff;
+  word_t entry;
+  word_t phoff;
+  word_t shoff;
   uint flags;
   ushort ehsize;
   ushort phentsize;
@@ -25,12 +25,12 @@ struct elfhdr {
 struct proghdr {
   uint32 type;
   uint32 flags;
-  uint64 off;
-  uint64 vaddr;
-  uint64 paddr;
-  uint64 filesz;
-  uint64 memsz;
-  uint64 align;
+  word_t off;
+  word_t vaddr;
+  word_t paddr;
+  word_t filesz;
+  word_t memsz;
+  word_t align;
 };
 
 // Values for Proghdr type

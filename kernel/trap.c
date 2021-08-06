@@ -21,7 +21,7 @@ void kernelvec();
 extern int devintr();
 
 static const char *
-scause_desc(uint64 stval);
+scause_desc(word_t stval);
 
 void
 trapinit(void)
@@ -33,7 +33,7 @@ trapinit(void)
 void
 trapinithart(void)
 {
-  w_stvec((uint64)kernelvec);
+  w_stvec((word_t)kernelvec);
 }
 
 //
@@ -50,7 +50,7 @@ usertrap(void)
 
   // send interrupts and exceptions to kerneltrap(),
   // since we're now in the kernel.
-  w_stvec((uint64)kernelvec);
+  w_stvec((word_t)kernelvec);
 
   struct proc *p = myproc();
   
@@ -76,13 +76,13 @@ usertrap(void)
     // ok
   } else if(r_scause() == 13 || r_scause() == 15) { // ccc:mmap
     // 13 for load page fault, 15 for store page fault
-    uint64 fault_vaddr = r_stval();
+    word_t fault_vaddr = r_stval();
     if(fault_vaddr >= MMAP_VSTART && fault_vaddr < MMAP_VEND) {
       pagetable_t pagetable = p->pagetable;
-      uint64 vpage_base = PGROUNDDOWN(fault_vaddr);
+      word_t vpage_base = PGROUNDDOWN(fault_vaddr);
       int map_sel = (vpage_base - MMAP_VSTART) / MMAP_SIZE;
       struct map_info *map = &p->minfo[map_sel];
-      uint64 map_start = map->vstart;
+      word_t map_start = map->vstart;
 
       // check for invalid mapping & access
       if(map->used == 0 || fault_vaddr >= map->vend) {
@@ -91,8 +91,8 @@ usertrap(void)
         goto end;
       }
 
-      uint64 file_start = vpage_base - map_start;
-      uint64 read_length = PGSIZE;
+      word_t file_start = vpage_base - map_start;
+      word_t read_length = PGSIZE;
       if(read_length > map->length - file_start)
         read_length = map->length - file_start;
       
@@ -108,10 +108,10 @@ usertrap(void)
 
       memset(mem, 0, PGSIZE);
       ilock(f->ip);
-      readi(f->ip, 0, (uint64)mem, file_start, read_length);
+      readi(f->ip, 0, (word_t)mem, file_start, read_length);
       iunlock(f->ip);
 
-      if(mappages(pagetable, vpage_base, PGSIZE, (uint64)mem, prot|PTE_U) != 0){
+      if(mappages(pagetable, vpage_base, PGSIZE, (word_t)mem, prot|PTE_U) != 0){
         printf("usertrap(): segfault: cannot map a page");
         kfree(mem);
         p->killed = 1;
@@ -158,7 +158,7 @@ usertrapret(void)
   // the process next re-enters the kernel.
   p->tf->kernel_satp = r_satp();         // kernel page table
   p->tf->kernel_sp = p->kstack + PGSIZE; // process's kernel stack
-  p->tf->kernel_trap = (uint64)usertrap;
+  p->tf->kernel_trap = (word_t)usertrap;
   p->tf->kernel_hartid = r_tp();         // hartid for cpuid()
 
   // set up the registers that trampoline.S's sret will use
@@ -174,13 +174,13 @@ usertrapret(void)
   w_sepc(p->tf->epc);
 
   // tell trampoline.S the user page table to switch to.
-  uint64 satp = MAKE_SATP(p->pagetable);
+  word_t satp = MAKE_SATP(p->pagetable);
 
   // jump to trampoline.S at the top of memory, which 
   // switches to the user page table, restores user registers,
   // and switches to user mode with sret.
-  uint64 fn = TRAMPOLINE + (userret - trampoline);
-  ((void (*)(uint64,uint64))fn)(TRAPFRAME, satp);
+  word_t fn = TRAMPOLINE + (userret - trampoline);
+  ((void (*)(word_t,word_t))fn)(TRAPFRAME, satp);
 }
 
 // interrupts and exceptions from kernel code go here via kernelvec,
@@ -189,9 +189,9 @@ void
 kerneltrap()
 {
   int which_dev = 0;
-  uint64 sepc = r_sepc();
-  uint64 sstatus = r_sstatus();
-  uint64 scause = r_scause();
+  word_t sepc = r_sepc();
+  word_t sstatus = r_sstatus();
+  word_t scause = r_scause();
   
   if((sstatus & SSTATUS_SPP) == 0)
     panic("kerneltrap: not from supervisor mode");
@@ -231,7 +231,7 @@ clockintr()
 int
 devintr()
 {
-  uint64 scause = r_scause();
+  word_t scause = r_scause();
 
   if((scause & 0x8000000000000000L) &&
      (scause & 0xff) == 9){
@@ -274,7 +274,7 @@ devintr()
 }
 
 static const char *
-scause_desc(uint64 stval)
+scause_desc(word_t stval)
 {
   static const char *intr_desc[16] = {
     [0] "user software interrupt",
@@ -312,8 +312,8 @@ scause_desc(uint64 stval)
     [14] "<reserved for future standard use>",
     [15] "store/AMO page fault",
   };
-  uint64 interrupt = stval & 0x8000000000000000L;
-  uint64 code = stval & ~0x8000000000000000L;
+  word_t interrupt = stval & 0x8000000000000000L;
+  word_t code = stval & ~0x8000000000000000L;
   if (interrupt) {
     if (code < NELEM(intr_desc)) {
       return intr_desc[code];

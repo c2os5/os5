@@ -41,9 +41,9 @@ struct file*    filealloc(void);
 void            fileclose(struct file*);
 struct file*    filedup(struct file*);
 void            fileinit(void);
-int             fileread(struct file*, uint64, int n);
-int             filestat(struct file*, uint64 addr);
-int             filewrite(struct file*, uint64, int n);
+int             fileread(struct file*, word_t, int n);
+int             filestat(struct file*, word_t addr);
+int             filewrite(struct file*, word_t, int n);
 
 // fs.c
 void            fsinit(int);
@@ -60,9 +60,9 @@ void            iupdate(struct inode*);
 int             namecmp(const char*, const char*);
 struct inode*   namei(char*);
 struct inode*   nameiparent(char*, char*);
-int             readi(struct inode*, int, uint64, uint, uint);
+int             readi(struct inode*, int, word_t, uint, uint);
 void            stati(struct inode*, struct stat*);
-int             writei(struct inode*, int, uint64, uint, uint);
+int             writei(struct inode*, int, word_t, uint, uint);
 
 // net.c
 void            net_rx(struct mbuf*);
@@ -73,8 +73,8 @@ void            sockinit(void);
 int             sockalloc(struct file **, uint32, uint16, uint16);
 void            sockrecvudp(struct mbuf*, uint32, uint16, uint16);
 void            sockclose(struct sock *);
-int             sockwrite(struct sock *, uint64, int);
-int             sockread(struct sock *, uint64, int);
+int             sockwrite(struct sock *, word_t, int);
+int             sockread(struct sock *, word_t, int);
 
 // ramdisk.c
 void            ramdiskinit(void);
@@ -98,8 +98,8 @@ void            crash_op(int,int);
 // pipe.c
 int             pipealloc(struct file**, struct file**);
 void            pipeclose(struct pipe*, int);
-int             piperead(struct pipe*, uint64, int);
-int             pipewrite(struct pipe*, uint64, int);
+int             piperead(struct pipe*, word_t, int);
+int             pipewrite(struct pipe*, word_t, int);
 
 // printf.c
 void            printf(char*, ...);
@@ -112,7 +112,7 @@ void            exit(int);
 int             fork(void);
 int             growproc(int);
 pagetable_t     proc_pagetable(struct proc *);
-void            proc_freepagetable(pagetable_t, uint64);
+void            proc_freepagetable(pagetable_t, word_t);
 int             kill(int);
 struct cpu*     mycpu(void);
 struct cpu*     getmycpu(void);
@@ -123,11 +123,11 @@ void            sched(void);
 void            setproc(struct proc*);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
-int             wait(uint64);
+int             wait(word_t);
 void            wakeup(void*);
 void            yield(void);
-int             either_copyout(int user_dst, uint64 dst, void *src, uint64 len);
-int             either_copyin(void *dst, int user_src, uint64 src, uint64 len);
+int             either_copyout(int user_dst, word_t dst, void *src, word_t len);
+int             either_copyin(void *dst, int user_src, word_t src, word_t len);
 void            procdump(void);
 
 // swtch.S
@@ -140,7 +140,7 @@ void            initlock(struct spinlock*, char*);
 void            release(struct spinlock*);
 void            push_off(void);
 void            pop_off(void);
-uint64          sys_ntas(void);
+word_t          sys_ntas(void);
 
 // sleeplock.c
 void            acquiresleep(struct sleeplock*);
@@ -160,9 +160,9 @@ char*           strncpy(char*, const char*, int);
 // syscall.c
 int             argint(int, int*);
 int             argstr(int, char*, int);
-int             argaddr(int, uint64 *);
-int             fetchstr(uint64, char*, int);
-int             fetchaddr(uint64, uint64*);
+int             argaddr(int, word_t *);
+int             fetchstr(word_t, char*, int);
+int             fetchaddr(word_t, word_t*);
 void            syscall();
 
 // trap.c
@@ -181,25 +181,25 @@ int             uartgetc(void);
 // vm.c
 void            kvminit(void);
 void            kvminithart(void);
-uint64          kvmpa(uint64);
-void            kvmmap(uint64, uint64, uint64, int);
-int             mappages(pagetable_t, uint64, uint64, uint64, int);
+word_t          kvmpa(word_t);
+void            kvmmap(word_t, word_t, word_t, int);
+int             mappages(pagetable_t, word_t, word_t, word_t, int);
 pagetable_t     uvmcreate(void);
 void            uvminit(pagetable_t, uchar *, uint);
-uint64          uvmalloc(pagetable_t, uint64, uint64);
-uint64          uvmdealloc(pagetable_t, uint64, uint64);
-int             uvmcopy(pagetable_t, pagetable_t, uint64);
-void            uvmfree(pagetable_t, uint64);
-void            uvmunmap(pagetable_t, uint64, uint64, int);
-void            uvmclear(pagetable_t, uint64);
-uint64          walkaddr(pagetable_t, uint64);
-int             copyout(pagetable_t, uint64, char *, uint64);
-int             copyin(pagetable_t, char *, uint64, uint64);
-int             copyinstr(pagetable_t, char *, uint64, uint64);
+word_t          uvmalloc(pagetable_t, word_t, word_t);
+word_t          uvmdealloc(pagetable_t, word_t, word_t);
+int             uvmcopy(pagetable_t, pagetable_t, word_t);
+void            uvmfree(pagetable_t, word_t);
+void            uvmunmap(pagetable_t, word_t, word_t, int);
+void            uvmclear(pagetable_t, word_t);
+word_t          walkaddr(pagetable_t, word_t);
+int             copyout(pagetable_t, word_t, char *, word_t);
+int             copyin(pagetable_t, char *, word_t, word_t);
+int             copyinstr(pagetable_t, char *, word_t, word_t);
 
 // ccc:mmap
-uint64          sys_mmap(void);
-uint64          sys_munmap(void);
+word_t          sys_mmap(void);
+word_t          sys_munmap(void);
 void            mmap_dup(pagetable_t, struct map_info*);
 void            mmap_dedup(pagetable_t, struct map_info*);
 
@@ -223,7 +223,7 @@ void            virtio_disk_intr(int);
 // buddy.c
 void           bd_init(void*,void*);
 void           bd_free(void*);
-void           *bd_malloc(uint64);
+void           *bd_malloc(word_t);
 
 struct list {
   struct list *next;

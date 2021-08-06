@@ -45,7 +45,7 @@ e1000_init(uint32 *xregs)
     tx_ring[i].status = E1000_TXD_STAT_DD;
     tx_mbufs[i] = 0;
   }
-  regs[E1000_TDBAL] = (uint64) tx_ring;
+  regs[E1000_TDBAL] = (uint64) (word_t) tx_ring;
   if(sizeof(tx_ring) % 128 != 0)
     panic("e1000");
   regs[E1000_TDLEN] = sizeof(tx_ring);
@@ -57,9 +57,9 @@ e1000_init(uint32 *xregs)
     rx_mbufs[i] = mbufalloc(0);
     if (!rx_mbufs[i])
       panic("e1000");
-    rx_ring[i].addr = (uint64) rx_mbufs[i]->head;
+    rx_ring[i].addr = (uint64) (word_t) rx_mbufs[i]->head;
   }
-  regs[E1000_RDBAL] = (uint64) rx_ring;
+  regs[E1000_RDBAL] = (uint64) (word_t) rx_ring;
   if(sizeof(rx_ring) % 128 != 0)
     panic("e1000");
   regs[E1000_RDH] = 0;
@@ -108,7 +108,7 @@ e1000_transmit(struct mbuf *m) {
     mbuffree(tx_mbufs[desc_pos]);
 
   tx_mbufs[desc_pos] = m;
-  tx_ring[desc_pos].addr = (uint64) m->head;
+  tx_ring[desc_pos].addr = (uint64) (word_t) m->head;
   tx_ring[desc_pos].length = m->len;
   tx_ring[desc_pos].cmd = E1000_TXD_CMD_RS | E1000_TXD_CMD_EOP;
 
@@ -134,7 +134,7 @@ e1000_recv(void) {
     rx_mbufs[desc_pos] = mbufalloc(0);
     if (!rx_mbufs[desc_pos])
       panic("e1000");
-    rx_ring[desc_pos].addr = (uint64) rx_mbufs[desc_pos]->head;
+    rx_ring[desc_pos].addr = (uint64) (word_t) rx_mbufs[desc_pos]->head;
     rx_ring[desc_pos].status = 0;
 
     regs[E1000_RDT] = desc_pos;

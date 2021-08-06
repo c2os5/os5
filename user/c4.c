@@ -6,14 +6,6 @@
 
 // Written by Robert Swierczek
 // 修改者: 陳鍾誠 (模組化並加上中文註解)
-/*
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <unistd.h>
-#include <fcntl.h>
-// #define int long long
-*/
 #include "../lib/lib.h"
 
 char *p, *lp, // current position in source code (p: 目前原始碼指標, lp: 上一行原始碼指標)

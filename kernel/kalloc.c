@@ -29,8 +29,8 @@ kinit()
 {
   initlock(&kmem.lock, "kmem");
   kmem.ref_count = (uint*)end;
-  uint64 rc_pages = ((((PHYSTOP - (uint64)end) >> 12) + 1) * sizeof(uint) >> 12) + 1;
-  uint64 rc_offset = (uint64)rc_pages << 12;
+  word_t rc_pages = ((((PHYSTOP - (word_t)end) >> 12) + 1) * sizeof(uint) >> 12) + 1;
+  word_t rc_offset = (word_t)rc_pages << 12;
   freerange(end + rc_offset, (void*)PHYSTOP);
 }
 
@@ -38,7 +38,7 @@ void
 freerange(void *pa_start, void *pa_end)
 {
   char *p;
-  p = (char*)PGROUNDUP((uint64)pa_start);
+  p = (char*)PGROUNDUP((word_t)pa_start);
   for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
     kfree(p);
 }
@@ -52,7 +52,7 @@ kfree(void *pa)
 {
   struct run *r;
 
-  if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
+  if(((word_t)pa % PGSIZE) != 0 || (char*)pa < end || (word_t)pa >= PHYSTOP)
     panic("kfree");
 
   // Fill with junk to catch dangling refs.
@@ -60,7 +60,7 @@ kfree(void *pa)
   
   r = (struct run*)pa;
 
-  uint64 idx = ((uint64)pa - (uint64)end) >> 12;
+  word_t idx = ((word_t)pa - (word_t)end) >> 12;
   acquire(&kmem.lock);
   r->next = kmem.freelist;
   kmem.freelist = r;
@@ -80,7 +80,7 @@ kalloc(void)
   r = kmem.freelist;
   if(r) {
     kmem.freelist = r->next;
-    uint64 idx = ((uint64)r - (uint64)end) >> 12;
+    word_t idx = ((word_t)r - (word_t)end) >> 12;
     kmem.ref_count[idx] = 1;
   }
   release(&kmem.lock);
@@ -92,7 +92,7 @@ kalloc(void)
 
 void
 kref(void* pa) {
-  uint64 idx = ((uint64)pa - (uint64)end) >> 12;
+  word_t idx = ((word_t)pa - (word_t)end) >> 12;
 
   acquire(&kmem.lock);
   kmem.ref_count[idx]++;
@@ -101,7 +101,7 @@ kref(void* pa) {
 
 void
 kderef(void* pa) {
-  uint64 idx = ((uint64)pa - (uint64)end) >> 12;
+  word_t idx = ((word_t)pa - (word_t)end) >> 12;
   char shall_free = 0;
 
   acquire(&kmem.lock);

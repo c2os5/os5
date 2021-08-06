@@ -131,7 +131,7 @@ print_lock(struct spinlock *lk)
     printf("lock: %s: #test-and-set %d #acquire() %d\n", lk->name, lk->nts, lk->n);
 }
 
-uint64
+word_t
 sys_ntas(void)
 {
   int zero = 0;
