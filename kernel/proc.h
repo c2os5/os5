@@ -82,7 +82,14 @@ struct trapframe {
 
 enum procstate { UNUSED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+// ccc: 32/64bits -- https://www.five-embeddev.com/riscv-isa-manual/latest/supervisor.html
+// 4.3 SV32... 4.4 SV39
+#ifdef __RV32__
+#define MMAP_VSTART (1L << 30) // 這裡亂猜，可能有問題？
+#else
 #define MMAP_VSTART (1L << 37)
+#endif
+
 #define MMAP_SIZE   (1L << 20)
 #define MMAP_NUM    32
 #define MMAP_VEND   (MMAP_VSTART + MMAP_NUM * MMAP_SIZE)

@@ -1,3 +1,4 @@
+RV32 = 1
 SERVERPORT = 27772
 FWDPORT = 29772
 
@@ -42,7 +43,16 @@ OBJS = \
 
 # riscv64-unknown-elf- or riscv64-linux-gnu-
 # perhaps in /opt/riscv/bin
-#TOOLPREFIX = 
+# TOOLPREFIX = 
+
+TOOLPREFIX = riscv64-unknown-elf-
+
+# ccc: RV32
+ifdef RV32
+QEMU = qemu-system-riscv32
+else
+QEMU = qemu-system-riscv64
+endif
 
 # Try to infer the correct TOOLPREFIX if not set
 ifndef TOOLPREFIX
@@ -56,8 +66,6 @@ TOOLPREFIX := $(shell if riscv64-unknown-elf-objdump -i 2>&1 | grep 'elf64-big' 
 	echo "***" 1>&2; exit 1; fi)
 endif
 
-QEMU = qemu-system-riscv64
-
 CC = $(TOOLPREFIX)gcc
 AS = $(TOOLPREFIX)gas
 LD = $(TOOLPREFIX)ld
@@ -67,6 +75,12 @@ OBJDUMP = $(TOOLPREFIX)objdump
 CFLAGS = -Wall -Werror -O -fno-omit-frame-pointer -ggdb
 CFLAGS += -MD
 CFLAGS += -mcmodel=medany
+
+# ccc
+ifdef RV32
+CFLAGS += -march=rv32imac -mabi=ilp32 -D__RV32__
+endif
+
 CFLAGS += -ffreestanding -fno-common -nostdlib -mno-relax
 CFLAGS += -I.
 CFLAGS += $(shell $(CC) -fno-stack-protector -E -x c /dev/null >/dev/null 2>&1 && echo -fno-stack-protector)
@@ -81,6 +95,9 @@ CFLAGS += -fno-pie -nopie
 endif
 
 LDFLAGS = -z max-page-size=4096
+ifdef RV32 
+LDFLAGS += -melf32lriscv
+endif
 
 $K/kernel: $(OBJS) $K/kernel.ld $U/initcode
 	$(LD) $(LDFLAGS) -T $K/kernel.ld -o $K/kernel $(OBJS) 
@@ -97,6 +114,26 @@ tags: $(OBJS) _init
 	etags *.S *.c
 
 ULIB = $L/_main.o $L/ulib.o $U/usys.o $L/printf.o $L/sscanf.o $L/umalloc.o
+
+# ccc
+ifdef RV32
+$K/swtch.o: $K/swtch32.S
+	$(CC) $(CFLAGS) -I. -Ikernel -c $< -o $@
+$K/kernelvec.o: $K/kernelvec32.S
+	$(CC) $(CFLAGS) -I. -Ikernel -c $< -o $@
+$K/trampoline.o: $K/trampoline32.S
+	$(CC) $(CFLAGS) -I. -Ikernel -c $< -o $@
+$U/uthread_switch.o: $U/uthread_switch32.S
+	$(CC) $(CFLAGS) -I. -Ikernel -c $< -o $@
+endif
+
+%.o: %.c
+	$(CC) $(CFLAGS) -I. -Ikernel -c $< -o $@
+#	$(CC) $(CFLAGS) -I. -Ikernel -c $^ -o $@
+
+%.o: %.S
+	$(CC) $(CFLAGS) -I. -Ikernel -c $< -o $@
+#	$(CC) $(CFLAGS) -I. -Ikernel -c $^ -o $@
 
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e _main -Ttext 0 -o $@ $^

@@ -181,10 +181,15 @@ w_mtvec(word_t x)
   asm volatile("csrw mtvec, %0" : : "r" (x));
 }
 
-// use riscv's sv39 page table scheme.
+// ccc: 32/64bits
+#ifdef __RV32__ // use riscv's sv32 page table scheme.
+#define SATP_SV32 (1L << 31)
+#define MAKE_SATP(pagetable) (SATP_SV32 | (((uint32)pagetable) >> 12))
+#else // use riscv's sv39 page table scheme.
 #define SATP_SV39 (8L << 60)
-
 #define MAKE_SATP(pagetable) (SATP_SV39 | (((word_t)pagetable) >> 12))
+#endif
+
 
 // supervisor address translation and protection;
 // holds the address of the page table.
@@ -349,7 +354,12 @@ sfence_vma()
 // MAXVA is actually one bit less than the max allowed by
 // Sv39, to avoid having to sign-extend virtual addresses
 // that have the high bit set.
+// ccc: 32/64 bits
+#ifdef __RV32__
+#define MAXVA 0xFFFFFFFF
+#else
 #define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
+#endif
 
 typedef word_t pte_t;
 typedef word_t *pagetable_t; // 512 PTEs

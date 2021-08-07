@@ -22,8 +22,7 @@ init:
   .string "/init\0"
 
 # char *argv[] = { init, 0 };
-# .p2align 2 // ccc remove
-.p2align 3 // ccc add
+.p2align 2
 argv:
   .long init
   .long 0
