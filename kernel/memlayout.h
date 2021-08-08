@@ -47,12 +47,15 @@
 // the kernel expects there to be RAM
 // for use by the kernel and user pages
 // from physical address 0x80000000 to PHYSTOP.
+#ifdef __RV32__
+#define KERNBASE 0x80000000
+#define PHYSTOP (KERNBASE + 128*1024*1024)
+#define TRAMPOLINE (MAXVA - PGSIZE + 1) // ccc:32bits https://github.com/joehattori/xv6-rv32im/commit/de7444f3b6aa78de2197d7049bdb512bb3dcd444
+#else
 #define KERNBASE 0x80000000L
 #define PHYSTOP (KERNBASE + 128*1024*1024)
-
-// map the trampoline page to the highest address,
-// in both user and kernel space.
-#define TRAMPOLINE (MAXVA - PGSIZE)
+#define TRAMPOLINE (MAXVA - PGSIZE) // map the trampoline page to the highest address, in both user and kernel space.
+#endif
 
 // map kernel stacks beneath the trampoline,
 // each surrounded by invalid guard pages.

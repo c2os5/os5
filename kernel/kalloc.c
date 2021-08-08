@@ -21,25 +21,27 @@ struct run {
 struct {
   struct spinlock lock;
   struct run *freelist;
-  uint *ref_count;
+  uint *ref_count; // 注意： ref_count 是指標 (陣列)
 } kmem;
 
 void
 kinit()
 {
   initlock(&kmem.lock, "kmem");
-  kmem.ref_count = (uint*)end;
-  word_t rc_pages = ((((PHYSTOP - (word_t)end) >> 12) + 1) * sizeof(uint) >> 12) + 1;
-  word_t rc_offset = (word_t)rc_pages << 12;
+  kmem.ref_count = (uint*)end; // 設定 ref_count 指向核心結束點
+  word_t rc_pages = ((((PHYSTOP - (word_t)end) >> 12) + 1) * sizeof(uint) >> 12) + 1; // 分配的頁數
+  word_t rc_offset = (word_t)rc_pages << 12; // 分配的區域大小 (bytes)。 
   freerange(end + rc_offset, (void*)PHYSTOP);
+  // 問：為何核心還沒啟動就得 free (xv6 也是如此，只是用 freerange(end, PHYSTOP))
+  // 答：因為實體記憶體有多少，必須一開始就知道，這樣才能分配出去並管理。
 }
 
 void
 freerange(void *pa_start, void *pa_end)
 {
   char *p;
-  p = (char*)PGROUNDUP((word_t)pa_start);
-  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
+  p = (char*)PGROUNDUP((word_t)pa_start); // 取得頁起始位址
+  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE) // 一頁一頁釋放
     kfree(p);
 }
 

@@ -20,7 +20,9 @@ main()
     printf("\n");
     printf("xv6 kernel is booting\n");
     printf("\n");
+    printf("kinit()...\n");
     kinit();         // physical page allocator
+    printf("kvminit()...\n");
     kvminit();       // create kernel page table
     kvminithart();   // turn on paging
     procinit();      // process table
@@ -34,6 +36,7 @@ main()
     virtio_disk_init(minor(ROOTDEV)); // emulated hard disk
     pci_init();
     sockinit();
+    printf("userinit()...\n");
     userinit();      // first user process
     __sync_synchronize();
     started = 1;

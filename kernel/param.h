@@ -1,5 +1,11 @@
 #define NPROC        10  // maximum number of processes
-#define NCPU          8  // maximum number of CPUs
+
+#ifdef __RV32__
+#define NCPU          2   // ccc: 32bits 
+#else
+#define NCPU          8  // maximum number of CPUs 
+#endif
+
 #define NOFILE       16  // open files per process
 #define NFILE       100  // open files per system
 #define NINODE       50  // maximum number of active i-nodes
