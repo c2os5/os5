@@ -78,7 +78,7 @@ virtio_disk_init(int n)
   *R(n, VIRTIO_MMIO_STATUS) = status;
 
   // negotiate features
-  uint64 features = *R(n, VIRTIO_MMIO_DEVICE_FEATURES);
+  word_t features = *R(n, VIRTIO_MMIO_DEVICE_FEATURES);
   features &= ~(1 << VIRTIO_BLK_F_RO);
   features &= ~(1 << VIRTIO_BLK_F_SCSI);
   features &= ~(1 << VIRTIO_BLK_F_CONFIG_WCE);
@@ -107,7 +107,7 @@ virtio_disk_init(int n)
     panic("virtio disk max queue too short");
   *R(n, VIRTIO_MMIO_QUEUE_NUM) = NUM;
   memset(disk[n].pages, 0, sizeof(disk[n].pages));
-  *R(n, VIRTIO_MMIO_QUEUE_PFN) = ((uint64)disk[n].pages) >> PGSHIFT;
+  *R(n, VIRTIO_MMIO_QUEUE_PFN) = ((word_t)disk[n].pages) >> PGSHIFT;
 
   // desc = pages -- num * VRingDesc
   // avail = pages + 0x40 -- 2 * uint16, then num * uint16
@@ -215,12 +215,12 @@ virtio_disk_rw(int n, struct buf *b, int write)
 
   // buf0 is on a kernel stack, which is not direct mapped,
   // thus the call to kvmpa().
-  disk[n].desc[idx[0]].addr = (uint64) kvmpa((uint64) &buf0);
+  disk[n].desc[idx[0]].addr = (uint64) (word_t) kvmpa((word_t) &buf0);
   disk[n].desc[idx[0]].len = sizeof(buf0);
   disk[n].desc[idx[0]].flags = VRING_DESC_F_NEXT;
   disk[n].desc[idx[0]].next = idx[1];
 
-  disk[n].desc[idx[1]].addr = (uint64) b->data;
+  disk[n].desc[idx[1]].addr = (uint64) (word_t) b->data;
   disk[n].desc[idx[1]].len = BSIZE;
   if(write)
     disk[n].desc[idx[1]].flags = 0; // device reads b->data
@@ -230,7 +230,7 @@ virtio_disk_rw(int n, struct buf *b, int write)
   disk[n].desc[idx[1]].next = idx[2];
 
   disk[n].info[idx[0]].status = 0;
-  disk[n].desc[idx[2]].addr = (uint64) &disk[n].info[idx[0]].status;
+  disk[n].desc[idx[2]].addr = (uint64) (word_t) &disk[n].info[idx[0]].status;
   disk[n].desc[idx[2]].len = 1;
   disk[n].desc[idx[2]].flags = VRING_DESC_F_WRITE; // device writes the status
   disk[n].desc[idx[2]].next = 0;

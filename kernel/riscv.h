@@ -181,16 +181,6 @@ w_mtvec(word_t x)
   asm volatile("csrw mtvec, %0" : : "r" (x));
 }
 
-// ccc: 32/64bits
-#ifdef __RV32__ // use riscv's sv32 page table scheme.
-#define SATP_SV32 (1L << 31)
-#define MAKE_SATP(pagetable) (SATP_SV32 | (((uint32)pagetable) >> 12))
-#else // use riscv's sv39 page table scheme.
-#define SATP_SV39 (8L << 60)
-#define MAKE_SATP(pagetable) (SATP_SV39 | (((word_t)pagetable) >> 12))
-#endif
-
-
 // supervisor address translation and protection;
 // holds the address of the page table.
 static inline void 
@@ -346,20 +336,34 @@ sfence_vma()
 #define PTE_FLAGS(pte) ((pte) & 0x3FF)
 
 // extract the three 9-bit page table indices from a virtual address.
+// one beyond the highest possible virtual address.
+// MAXVA is actually one bit less than the max allowed by
+// SvX3X, to avoid having to sign-extend virtual addresses
+// that have the high bit set.
+
+
+// ccc: 32/64bits
+#ifdef __RV32__ // ccc: use riscv's sv32 page table scheme.
+ 
+#define SATP_SV32 (1L << 31)
+#define MAKE_SATP(pagetable) (SATP_SV32 | (((word_t)pagetable) >> 12))
+
+#define PXMASK          0x3FF
+#define PXSHIFT(level)  (PGSHIFT+(10*(level)))
+#define PX(level, va) ((((word_t) (va)) >> PXSHIFT(level)) & PXMASK)
+#define MAXVA 0xFFFFFFFF
+
+#else // use riscv's sv39 page table scheme.
+
+#define SATP_SV39 (8L << 60)
+#define MAKE_SATP(pagetable) (SATP_SV39 | (((word_t)pagetable) >> 12))
+
 #define PXMASK          0x1FF // 9 bits
 #define PXSHIFT(level)  (PGSHIFT+(9*(level)))
 #define PX(level, va) ((((word_t) (va)) >> PXSHIFT(level)) & PXMASK)
-
-// one beyond the highest possible virtual address.
-// MAXVA is actually one bit less than the max allowed by
-// Sv39, to avoid having to sign-extend virtual addresses
-// that have the high bit set.
-// ccc: 32/64 bits
-#ifdef __RV32__
-#define MAXVA 0xFFFFFFFF
-#else
 #define MAXVA (1L << (9 + 9 + 9 + 12 - 1))
+
 #endif
 
 typedef word_t pte_t;
-typedef word_t *pagetable_t; // 512 PTEs
+typedef word_t *pagetable_t; // 64bits/512 PTEs, 32bits/1024 PTEs
