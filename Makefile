@@ -96,8 +96,8 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB = $L/_main.o $L/ulib.o $U/usys.o $L/printf.o $L/sscanf.o $L/umalloc.o
-
+ULIB =  $L/ulib.o $U/usys.o $L/printf.o $L/sscanf.o $L/umalloc.o
+# $L/_main.o
 _%: %.o $(ULIB)
 	$(LD) $(LDFLAGS) -N -e _main -Ttext 0 -o $@ $^
 #	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
