@@ -96,10 +96,10 @@ $U/initcode: $U/initcode.S
 tags: $(OBJS) _init
 	etags *.S *.c
 
-ULIB =  $L/ulib.o $U/usys.o $L/printf.o $L/sscanf.o $L/umalloc.o
+ULIB =  $L/run_main.o $L/ulib.o $U/usys.o $L/printf.o $L/sscanf.o $L/umalloc.o
 # $L/_main.o
 _%: %.o $(ULIB)
-	$(LD) $(LDFLAGS) -N -e _main -Ttext 0 -o $@ $^
+	$(LD) $(LDFLAGS) -N -e run_main -Ttext 0 -o $@ $^
 #	$(LD) $(LDFLAGS) -N -e main -Ttext 0 -o $@ $^
 #	$(OBJDUMP) -S $@ > $*.asm
 #	$(OBJDUMP) -t $@ | sed '1,/SYMBOL TABLE/d; s/ .* / /; /^$$/d' > $*.sym
